@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Production sitemap
+Sitemap: https://saudivisit.net/sitemap.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1
+
+# Disallow admin and private areas if they exist
+Disallow: /admin/
+Disallow: /.env
+Disallow: /vendor/
+
+# Allow Google Image Bot
+User-agent: Googlebot-Image
+Allow: /
+
+# Allow social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /

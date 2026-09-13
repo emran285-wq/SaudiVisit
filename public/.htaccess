@@ -1,0 +1,16 @@
+DirectoryIndex index.php
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^sitemap\.xml$ sitemap.xml.php [L]
+    RewriteRule ^\.env - [F,L]
+    RewriteRule ^(app|database|storage)/ - [F,L]
+    ErrorDocument 404 /404.php
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

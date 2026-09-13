@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /.env
+Disallow: /storage/
+Disallow: /app/
+Disallow: /database/
+Sitemap: https://saudivisit.net/sitemap.xml
