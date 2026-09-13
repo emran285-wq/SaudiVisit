@@ -1,0 +1,28 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$USER/public_html/saudivisit/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -R .htaccess $DEPLOYPATH
+    - /bin/cp -R 404.php $DEPLOYPATH
+    - /bin/cp -R about.php $DEPLOYPATH
+    - /bin/cp -R article.php $DEPLOYPATH
+    - /bin/cp -R articles.php $DEPLOYPATH
+    - /bin/cp -R attractions.php $DEPLOYPATH
+    - /bin/cp -R contact.php $DEPLOYPATH
+    - /bin/cp -R destination.php $DEPLOYPATH
+    - /bin/cp -R destinations.php $DEPLOYPATH
+    - /bin/cp -R index.php $DEPLOYPATH
+    - /bin/cp -R planner.php $DEPLOYPATH
+    - /bin/cp -R privacy.php $DEPLOYPATH
+    - /bin/cp -R robots.txt $DEPLOYPATH
+    - /bin/cp -R sitemap.xml.php $DEPLOYPATH
+    - /bin/cp -R assets $DEPLOYPATH
+    - /bin/cp -R includes $DEPLOYPATH
+    - /bin/cp -R data $DEPLOYPATH
+    - /bin/cp -R app $DEPLOYPATH
+    - /bin/cp -R scripts $DEPLOYPATH
+    - /bin/cp -R public $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/storage/cache
+    - /bin/mkdir -p $DEPLOYPATH/storage/logs
+    - /bin/mkdir -p $DEPLOYPATH/storage/uploads
