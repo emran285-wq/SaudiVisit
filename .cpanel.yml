@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/$USER/public_html/saudivisit/
+    - export DEPLOYPATH=/home/apexbus1/saudivisit.net/
     - /bin/mkdir -p $DEPLOYPATH
     - /bin/cp -R .htaccess $DEPLOYPATH
     - /bin/cp -R 404.php $DEPLOYPATH
