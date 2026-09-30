@@ -1,64 +1,51 @@
-# SaudiVisit.net
+# SaudiVisit
 
-SaudiVisit.net is a PHP travel platform for Saudi Arabia destinations, long-form travel guides, attractions and a rule-based trip planner. It uses PHP 8+, semantic HTML, responsive CSS and vanilla JavaScript with no runtime framework or database dependency.
-## Features
+SaudiVisit is a custom, plain-PHP editorial site and CMS. It uses PHP 8.1 or newer, MySQL/MariaDB through PDO, and Apache `mod_rewrite`. It has no framework, Composer packages, Node build, or production development server.
 
-- Destination guides for Riyadh, Jeddah, AlUla, Makkah, Madinah, Abha, Taif and Dammam.
-## Requirements
+## Runtime requirements
 
-- PHP 8.1 or newer.
-- Apache with PHP; `mod_rewrite` is recommended.
-- MySQL is not required for the current static-data release.
-## Repository Layout
+- PHP 8.1+ with `pdo_mysql`, `mbstring`, and `fileinfo` enabled.
+- MySQL 5.7+ or MariaDB 10.3+; InnoDB and `utf8mb4` support.
+- Apache with `mod_rewrite`, `mod_headers`, and permission to use the included `.htaccess` directives.
+- Writable `assets/uploads` for CMS media uploads and a private writable log path configured by `APP_LOG_FILE`.
 
-```text
-app/                 Bootstrap boundary for future modules
-data/                Current PHP content data
-includes/            Runtime config, helpers and shared templates
-public/              Production document-root wrappers and copied assets
-assets/              Legacy XAMPP asset source, preserved for compatibility
-database/             Sanitized future schema only
-storage/              Runtime cache, logs and uploads; never commit contents
-scripts/              Maintenance and validation scripts
-.github/workflows/    PHP syntax CI
-```
-## Local Installation
+## Local setup
 
-```powershell
-git clone YOUR_GITHUB_REPOSITORY_URL saudivisit
-cd saudivisit
-Copy-Item .env.example .env
-```
+1. Create a MySQL database and user, then grant the user access to that database.
+2. Import `database/schema.sql` into the selected database. `database/seed.sql` contains demo content only; do not import it into production.
+3. Copy `.env.example` to `.env` in the project root and set local database credentials. For local XAMPP, use `APP_ENV=local`, `APP_DEBUG=true`, and `APP_FORCE_HTTPS=false`. `.env` is ignored by Git.
+4. Enable Apache `mod_rewrite` and `AllowOverride All` for the project directory.
+5. Visit `http://localhost/saudivisit/`; the root redirects to `/en/`. Admin sign-in is at `/admin/login.php`.
+
+If you import demo seed data locally, set a password hash before signing in. Generate a hash with PHP CLI, then update the demo user's `password_hash` in your local database. The checked-in demo accounts cannot authenticate until you replace the reset marker.
+
+## Structure
+
+| Path | Purpose |
+|---|---|
+| `index.php` | Public front controller and locale routes |
+| `admin/` | CMS sign-in, content, media, pages, and redirects |
+| `app/` | PDO queries, authentication, helpers, and SEO |
+| `config/config.php` | Environment loading, app configuration, and bootstrap |
+| `templates/` | Public page templates |
+| `assets/css`, `assets/js`, `assets/images` | Browser assets; already production-ready, no build step |
+| `assets/favicon.ico`, favicon PNGs, `assets/apple-touch-icon.png` | Multi-size browser icon and Apple touch icon |
+| `assets/uploads/` | Writable user-upload directory; contents are not versioned |
+| `database/schema.sql` | Initial database schema only |
+| `database/seed.sql` | Optional local demo data, never production data |
+| `sitemap.php`, `robots.php`, `robots.txt` | Internal sitemap/robots endpoints; public sitemap is `/sitemap.xml` |
+| `scripts/deploy-cpanel.sh`, `.cpanel.yml` | Guarded allowlist deployment into a marked document root |
+
 ## Configuration
 
-Copy `.env.example` to `.env`. Never commit `.env`. Important variables are:
+The app reads the process environment first, then an optional `.env` file. It checks `APP_ENV_FILE`, the parent of the project/document root, and finally the project root. On cPanel, keep `.env` outside `public_html`, normally at `/home/CPANEL_USER/.env`. `SITE_URL` must be the origin only, with no path. Production defaults to HTTPS redirects, secure session cookies, hidden browser errors, and a log outside the document root.
 
-- `APP_ENV=local` or `production`.
-- `APP_DEBUG=true` locally and `false` in production.
-- `APP_URL` for the current browser origin.
-- `APP_BASE_PATH` for a subdirectory, or blank when `public/` is the document root.
-- `SITE_URL` for canonical production SEO URLs.
-- `DB_*` placeholders for a future database migration only.
-## Production Deployment
+Configuration variables and deployment steps are documented in [DEPLOYMENT_CPANEL.md](DEPLOYMENT_CPANEL.md). Never commit `.env`, passwords, production exports, logs, or uploaded media.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md). The preferred setup points the hosting document root at `public/`, sets production environment variables, enables HTTPS and keeps `.env`, `storage/`, database files and source data outside the public root. A fallback section covers hosts that only provide `public_html`.
-## GitHub Safety Checklist
+## CMS workflow
 
-Before the first push:
+Articles move through `draft`, `in_review`, `fact_review`, `approved`, `published`, and `archived`. Writers manage their drafts, reviewers fact-check, and editors/admins approve and publish. Saves create revisions and workflow actions are audit-logged; changing a published slug creates a redirect. Published-only filters protect public pages, search, and the sitemap.
 
-- [ ] `.env` is absent and `.env.example` contains no secrets.
-- [ ] No passwords, API keys, private customer data or database backups are present.
-- [ ] Runtime logs, cache and uploads are ignored.
-- [ ] Local PHP syntax and page checks pass.
-- [ ] Production `SITE_URL` and `APP_DEBUG=false` are documented in hosting settings.
-## Maintenance
+## Routing and dependencies
 
-```powershell
-Get-ChildItem -Recurse -Filter *.php | ForEach-Object { php -l $_.FullName }
-git pull origin main
-git add .
-git commit -m "content: expand Riyadh travel guide"
-git push origin main
-```
-
-Travel information can change. Verify visa, pilgrimage, opening-hour, ticket, safety, weather and transport details through authoritative sources before publishing or travelling.
+Existing locale routes and admin PHP endpoints are preserved. Requests for existing assets and files are served directly; other public routes reach `index.php`. PHP handles requests in production; no Node server, Composer install, dependency lockfile, or asset compilation is required. cPanel Git updates the checkout; the separate deploy script copies only runtime files into the live document root.

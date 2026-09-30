@@ -1,0 +1,1 @@
+Keep this writable cache directory in Git; runtime cache files are ignored.

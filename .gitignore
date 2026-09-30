@@ -2,22 +2,30 @@
 .env.*
 !.env.example
 
-/vendor/
-/node_modules/
-
-/storage/logs/*
-!/storage/logs/.gitkeep
+# Runtime output and writable data
+/logs/
 /storage/cache/*
 !/storage/cache/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
 /storage/uploads/*
 !/storage/uploads/.gitkeep
-/public/uploads/private/
+/assets/uploads/*
+!/assets/uploads/.gitkeep
+!/assets/uploads/.htaccess
 
+# Local configuration, editor/OS files, and database exports
+config/config.local.php
 *.log
+*.sql.gz
+*.sql.zip
+*.dump
+*.bak
+*.old
+*.swp
 *.tmp
-*.zip
-.DS_Store
+*.cache
 Thumbs.db
+.DS_Store
 .idea/
 .vscode/
-database/backups/

@@ -1,69 +1,38 @@
-# SaudiVisit.net Apache Configuration
-
-# Set default index file
-DirectoryIndex index.php
-
-# Prevent directory listing
-Options -Indexes
-
-# Security headers
-<IfModule mod_headers.c>
-    Header always set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-</IfModule>
-
-# URL Rewriting for clean URLs
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /saudivisit/
-    
-    # Prevent direct access to sensitive files
-    RewriteRule ^\.env$ - [F]
-    RewriteRule ^(app|database|storage)/ - [F]
-    RewriteRule ^vendor/ - [F]
-    RewriteRule ^\.git/ - [F]
-    RewriteRule ^\.gitignore$ - [F]
-    
-    # Serve sitemap.xml from sitemap.xml.php
-    RewriteRule ^sitemap\.xml$ sitemap.xml.php [L]
-    
-    # Handle 404s gracefully
-    ErrorDocument 404 /saudivisit/404.php
+
+    # Private application files remain outside the URL surface on shared hosting.
+    RewriteRule ^(?:app|config|database|logs|scripts|storage|templates)(?:/|$) - [F,L,NC]
+    RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
+    RewriteRule (^|/)(?:\.env(?:\..*)?|.*\.(?:bak|dist|ini|log|sql|ya?ml|swp|tmp))$ - [F,L,NC]
+
+    # Clean public utility URLs; these are internal rewrites, not redirects.
+    RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
+    RewriteRule ^robots\.txt$ robots.php [L]
+
+    # Retired public PHP files may remain in existing roots; route only GET/HEAD through PHP.
+    RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
+    RewriteCond %{THE_REQUEST} \s/+([^?\s]+/)?(?:sitemap\.xml|sitemap|robots|about|contact|privacy|articles|article|destination|destinations|planner|attractions)\.php(?:[?\s]) [NC]
+    RewriteRule ^(?:sitemap\.xml|sitemap|robots|about|contact|privacy|articles|article|destination|destinations|planner|attractions)\.php$ index.php [QSA,L,NC]
+
+    # Serve existing files/directories directly (assets, admin, etc.)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Everything else goes through the front controller
+    RewriteRule ^ index.php [L]
 </IfModule>
 
-# Enable compression for better performance
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css
-    AddOutputFilterByType DEFLATE text/javascript application/javascript
-    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/json
-    AddOutputFilterByType DEFLATE application/rss+xml
-</IfModule>
+Options -Indexes
+DirectoryIndex index.php
 
-# Set UTF-8 character encoding
+# Default charset
 AddDefaultCharset UTF-8
-<FilesMatch "\.php$">
-    AddType application/x-httpd-php .php
-</FilesMatch>
 
-# Cache control for static assets
-<FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg|webp|woff|woff2|ttf|eot)$">
-    <IfModule mod_expires.c>
-        ExpiresActive On
-        ExpiresDefault "access plus 1 year"
-        Header append Cache-Control "public, immutable"
-    </IfModule>
-</FilesMatch>
-
-# Don't cache HTML/PHP files - they change frequently
-<FilesMatch "\.(php|html|htm)$">
-    <IfModule mod_expires.c>
-        ExpiresActive Off
-    </IfModule>
-    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0, private"
-    Header set Pragma "no-cache"
-    Header set Expires "0"
-</FilesMatch>
-
+# Security headers (best-effort on shared Apache)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
