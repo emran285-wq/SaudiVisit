@@ -1,4 +1,4 @@
 deployment:
   tasks:
-    # Replace CPANEL_USER with the actual account name before enabling deployment.
-    - DEPLOYMENT_TARGET="/home/CPANEL_USER/public_html" /bin/bash scripts/deploy-cpanel.sh
+    # Checkout is the live document root itself; "Update from Remote" already updates it in place, so this is a no-op deploy step.
+    - /bin/true

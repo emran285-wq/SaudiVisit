@@ -4,7 +4,7 @@
     # Private application files remain outside the URL surface on shared hosting.
     RewriteRule ^(?:app|config|database|logs|scripts|storage|templates)(?:/|$) - [F,L,NC]
     RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
-    RewriteRule (^|/)(?:\.env(?:\..*)?|.*\.(?:bak|dist|ini|log|sql|ya?ml|swp|tmp))$ - [F,L,NC]
+    RewriteRule (^|/)(?:\.env(?:\..*)?|.*\.(?:bak|dist|ini|log|md|sql|ya?ml|swp|tmp))$ - [F,L,NC]
 
     # Clean public utility URLs; these are internal rewrites, not redirects.
     RewriteRule ^sitemap\.xml$ sitemap.php [L,NC]
